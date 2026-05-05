@@ -1,0 +1,101 @@
+{
+  "style": "professional",
+  "contact": {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "phone": "+49 170 123 4567",
+    "location": "Berlin, Germany",
+    "linkedin": "linkedin.com/in/janedoe",
+    "github": "github.com/janedoe"
+  },
+  "summary": "**_Backend_ engineer `with` _`5`_* years of experience** building distributed systems in *Rust* and *Python*. Focused on high-throughput data pipelines and cloud-native architecture.",
+  "experience": [
+    {
+      "company": "Acme GmbH",
+      "title": "Senior Software Engineer",
+      "dates": "03.2022 – present",
+      "location": "Berlin, Germany",
+      "bullets": [
+        "Built distributed ingestion pipeline using *Rust* and *Apache Kafka*, reducing p99 latency by 40%.",
+        "Led migration of 3 legacy services to microservices, enabling independent deployments across teams.",
+        "Mentored 2 junior engineers through weekly code review and pair programming sessions."
+      ]
+    },
+    {
+      "company": "Startup OÜ",
+      "title": "Software Engineer",
+      "dates": "06.2019 – 02.2022",
+      "location": "Tallinn, Estonia",
+      "bullets": [
+        "Implemented OAuth 2.0 login flow using *FastAPI* and *PostgreSQL*, serving 50 k monthly active users.",
+        "Reduced CI pipeline from 18 min to 6 min by parallelising test suites in *GitHub Actions*."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Lviv Polytechnic National University",
+      "degree": "M.Sc. Computer Science",
+      "dates": "09.2016 – 06.2021",
+      "location": "Lviv, Ukraine",
+      "grade": "5.0 / 5.0"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Languages",
+      "items": [
+        "Rust",
+        "Python",
+        "TypeScript",
+        "SQL"
+      ]
+    },
+    {
+      "category": "Infrastructure",
+      "items": [
+        "Kafka",
+        "PostgreSQL",
+        "Docker",
+        "Kubernetes"
+      ]
+    },
+    {
+      "category": "Concepts",
+      "items": [
+        "Microservices",
+        "Event-Driven Architecture",
+        "REST",
+        "CI/CD"
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Solutions Architect – Associate",
+      "issuer": "Amazon Web Services",
+      "date": "11.2023"
+    }
+  ],
+  "languages": [
+    {
+      "name": "Ukrainian",
+      "level": "C2"
+    },
+    {
+      "name": "English",
+      "level": "C1"
+    },
+    {
+      "name": "German",
+      "level": "A2"
+    }
+  ],
+  "projects": [
+    {
+      "name": "typst-resume",
+      "description": "Open-source ATS-safe resume template for *Typst*. 200+ GitHub stars.",
+      "url": "github.com/janedoe/typst-resume"
+    }
+  ]
+}

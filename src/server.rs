@@ -72,8 +72,10 @@ impl IntoResponse for HttpError {
 
 /// Compile resume JSON to a PDF file.
 ///
-/// Accepts resume data and returns a compiled PDF. Some string fields support
-/// inline markup: `**bold**`, `*bold*`, `_italic_`, `` `code` ``.
+/// Some text strings support markdown with the following format:
+/// `**bold**`, `*bold*`, `_italic_`, `` `code` ``.
+/// Markers may be nested (e.g. `_**bold italic**_`). Unmatched markers are
+/// treated as plain text. Injection prevention mechanisms are in place.
 #[utoipa::path(
     post,
     path = "/generate",

@@ -256,7 +256,7 @@ mod tests {
     fn summary_markup_preserved() {
         let mut data = minimal();
         data.summary = Some("Expert in *Rust*.".to_owned());
-        assert!(render(&data).contains("strong[Rust]"));
+        assert!(render(&data).contains("#strong[Rust]"));
     }
 
     #[test]
