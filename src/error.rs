@@ -9,9 +9,6 @@ pub enum Error {
     #[error("PDF export failed: {0}")]
     PdfExport(String),
 
-    #[error("Font loading failed for file {path}")]
-    FontLoad { path: &'static str },
-
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 

@@ -2,11 +2,14 @@ mod cli;
 mod compiler;
 mod config;
 mod error;
-mod json_to_typst;
+mod resume;
 mod server;
+mod str_to_content;
+mod typst_writer;
 
-use cli::{Cli, Command};
+use cli::{Cli, Command, RenderArgs};
 use compiler::Compiler;
+use resume::ResumeData;
 
 use std::{
     fs,
@@ -18,8 +21,6 @@ use clap::Parser;
 use tokio::{net::TcpListener, signal};
 use tracing::info;
 use tracing_subscriber::EnvFilter;
-
-use crate::cli::RenderArgs;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -58,7 +59,7 @@ fn run_render(args: &RenderArgs) -> Result<()> {
     init_tracing("info");
 
     let json_bytes = fs::read(&args.input)?;
-    let data: serde_json::Value = serde_json::from_slice(&json_bytes)?;
+    let data: ResumeData = serde_json::from_slice(&json_bytes)?;
 
     let compiler = Compiler::new();
     let pdf = compiler.compile(&data)?;

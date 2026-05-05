@@ -12,16 +12,14 @@ use utoipa_scalar::{Scalar, Servable};
 
 use crate::compiler::Compiler;
 use crate::error::Error;
+use crate::resume::{ResumeData, resume_example};
 
 #[derive(OpenApi)]
-#[openapi(
-    info(
-        title = "PDF Generator",
-        version = env!("CARGO_PKG_VERSION"),
-        description = "Compiles resume JSON to PDF using the GetJobAI Typst template."
-    ),
-    components(schemas(ErrorResponse))
-)]
+#[openapi(info(
+    title = "PDF Generator",
+    version = env!("CARGO_PKG_VERSION"),
+    description = "Compiles resume JSON to PDF using the GetJobAI Typst template."
+))]
 struct ApiDoc;
 
 /// Error response returned on compilation failure or internal error.
@@ -74,48 +72,30 @@ impl IntoResponse for HttpError {
 
 /// Compile resume JSON to a PDF file.
 ///
-/// Accepts resume data and returns a compiled PDF. String fields support
+/// Accepts resume data and returns a compiled PDF. Some string fields support
 /// inline markup: `**bold**`, `*bold*`, `_italic_`, `` `code` ``.
 #[utoipa::path(
     post,
     path = "/generate",
     tag = "PDF",
     request_body(
-        content = serde_json::Value,
+        content = ResumeData,
         content_type = "application/json",
-        examples(
-            ("professional" = (
-                summary = "Professional style — Jane Doe",
-                value = json!({
-                    "style": "professional",
-                    "contact": {
-                        "name": "Jane Doe",
-                        "email": "jane@example.com",
-                        "location": "Berlin, Germany"
-                    },
-                    "summary": "Backend engineer with *Rust* and _Python_ experience.",
-                    "experience": [{
-                        "company": "Acme GmbH",
-                        "title": "Senior Engineer",
-                        "dates": "03.2022 – present",
-                        "bullets": ["Built a *Kafka* pipeline, reducing p99 latency by 40%."]
-                    }],
-                    "skills": [{"category": "Languages", "items": ["Rust", "Python"]}],
-                    "languages": [{"name": "English", "level": "C1"}]
-                })
-            ))
-        )
+        examples(("professional" = (
+            summary = "Professional style — Jane Doe",
+            value = json!(resume_example())
+        )))
     ),
     responses(
         (status = 200, description = "Compiled PDF", content_type = "application/pdf"),
         (status = 400, description = "Typst compilation failed", body = ErrorResponse),
-        (status = 422, description = "Request body is not valid JSON"),
+        (status = 422, description = "Request body is not valid JSON or fails schema validation"),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     )
 )]
 async fn generate_pdf(
     State(state): State<AppState>,
-    Json(data): Json<serde_json::Value>,
+    Json(data): Json<ResumeData>,
 ) -> Result<impl IntoResponse, HttpError> {
     let compiler = state.compiler.clone();
 
@@ -135,9 +115,7 @@ async fn generate_pdf(
     get,
     path = "/health",
     tag = "Meta",
-    responses(
-        (status = 200, description = "Service is healthy", body = str)
-    )
+    responses((status = 200, description = "Service is healthy", body = str))
 )]
 async fn health() -> &'static str {
     "ok"

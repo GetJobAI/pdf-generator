@@ -6,7 +6,8 @@ use typst_pdf::PdfOptions;
 use std::sync::Arc;
 
 use crate::error::Error;
-use crate::json_to_typst;
+use crate::resume::ResumeData;
+use crate::typst_writer;
 
 // Embedded at compile time. Path is relative to this source file (src/).
 static TEMPLATE: &str = include_str!("../template.typ");
@@ -14,7 +15,7 @@ static TEMPLATE: &str = include_str!("../template.typ");
 static JBM_REGULAR: &[u8] = include_bytes!("../fonts/JetBrainsMono-Regular.ttf");
 static JBM_BOLD: &[u8] = include_bytes!("../fonts/JetBrainsMono-Bold.ttf");
 
-/// Shared Typst compiler, `Clone` is cheap.
+/// Shared Typst compiler. `Clone` is cheap.
 #[derive(Clone)]
 pub struct Compiler {
     fonts: Arc<Vec<&'static [u8]>>,
@@ -31,12 +32,10 @@ impl Compiler {
         Self { fonts }
     }
 
-    /// Serialises `data` to a Typst expression, builds an in-memory world, and
-    /// compiles it to PDF bytes. No temp files or disk I/O.
-    pub fn compile(&self, data: &serde_json::Value) -> Result<Vec<u8>, Error> {
-        let typst_dict = json_to_typst::serialize(data);
-
-        let entrypoint = format!("#import \"template.typ\": resume\n#resume({typst_dict})");
+    /// Serialises `data` to a Typst source file, compiles it in-memory, and
+    /// returns the PDF bytes. No temp files or disk I/O.
+    pub fn compile(&self, data: &ResumeData) -> Result<Vec<u8>, Error> {
+        let entrypoint = typst_writer::render(data);
 
         let engine = TypstEngine::builder()
             .fonts(self.fonts.iter().copied())
@@ -73,7 +72,7 @@ impl Compiler {
     }
 }
 
-fn extract_diagnostics(err: &typst_as_lib::TypstAsLibError) -> Vec<String> {
+fn extract_diagnostics(err: &TypstAsLibError) -> Vec<String> {
     match err {
         TypstAsLibError::TypstSource(diags) => {
             diags.iter().map(|d| d.message.to_string()).collect()
