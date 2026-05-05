@@ -1,0 +1,8 @@
+target/
+.git/
+pdf/
+*.pdf
+wip
+docs/
+tests/
+.env*
