@@ -138,7 +138,7 @@ mod tests {
     #[test]
     fn nested_bold_in_italic() {
         assert_eq!(
-            str_to_content("_**bold italic code**_"),
+            str_to_content("_**bold italic**_"),
             "[#emph[#strong[bold italic]]]"
         );
     }
