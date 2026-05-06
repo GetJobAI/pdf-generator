@@ -1,0 +1,30 @@
+@startuml usecase
+left to right direction
+skinparam actorStyle stick
+skinparam packageStyle rectangle
+skinparam shadowing false
+actor "Developer" as Dev
+actor "Frontend" as Frontend
+actor "Resume Parser Service" as Parser
+
+rectangle "PDF Generator Service" {
+    usecase "Generate PDF\nPOST /generate" as UC_Generate
+    usecase "Check Health\nGET /health" as UC_Health
+    usecase "Browse API Docs\nGET /docs" as UC_Docs
+    usecase "Render PDF\nlocally (CLI)" as UC_CLI
+    usecase "Compile Resume\nto PDF" as UC_Compile
+}
+
+Dev --> UC_Generate
+Dev --> UC_Health
+Dev --> UC_Docs
+Dev --> UC_CLI
+
+Frontend --> UC_Generate
+Frontend --> UC_Health
+
+Parser --> UC_Generate
+
+UC_Generate ..> UC_Compile : <<include>>
+UC_CLI .> UC_Compile : <<include>>
+@enduml

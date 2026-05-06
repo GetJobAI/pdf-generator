@@ -1,0 +1,41 @@
+@startuml deployment
+skinparam shadowing false
+skinparam nodeStyle rectangle
+
+actor "Browser" as Browser
+' actor "Developer" as Dev
+
+node "VPS / Cloud Host" {
+    node "Docker Engine" {
+        node "proxy_network (bridge)" {
+            artifact "gateway\nCaddy :80/:443" as Gateway
+            artifact "frontend\nNext.js :3000" as Frontend
+            artifact "core-api\nPostgREST :3000" as CoreAPI
+            artifact "pdf-generator\nAxum :8080" as PdfGen
+            artifact "rabbitmq\n:5672" as RabbitMQ
+            artifact "db\nPostgreSQL :5432" as DB
+            artifact "qdrant\n:6334" as Qdrant
+            artifact "vectoriser" as Vectoriser
+            artifact "event-relay" as EventRelay
+        }
+    }
+}
+
+Browser --> Gateway : HTTPS :443
+' Dev --> PdfGen : HTTP :8080 (dev only,\nwith ports: mapping)
+
+Gateway --> Frontend : reverse proxy
+Gateway --> CoreAPI : reverse proxy\n(JWT validated)
+
+Frontend --> PdfGen : POST /generate (internal)
+Frontend --> CoreAPI : REST API
+
+CoreAPI --> DB : SQL
+
+Vectoriser --> DB : SQL
+Vectoriser --> Qdrant : gRPC
+Vectoriser --> RabbitMQ : AMQP consume
+
+EventRelay --> RabbitMQ : AMQP consume
+EventRelay --> Frontend : SSE push
+@enduml

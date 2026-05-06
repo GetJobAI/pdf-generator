@@ -1,0 +1,52 @@
+@startuml activity_str_to_content
+skinparam shadowing false
+start
+
+:Input: raw string **s**;
+:i = 0, plain_start = 0\nout = "";
+
+while (i < s.len()?) is (yes)
+    :rest = s[i..];
+
+    if (rest.strip_prefix("**")?) then (Some(after_open))
+        if (after_open.find("**")?) then (Some(close))
+            :flush: out += escape_content(s[plain_start..i]);
+            :recurse: inner = render_content(after_open[..close]);
+            :out += "#strong[" + inner + "]";
+            :i += 2 + close + 2\nplain_start = i;
+        else (None — unmatched)
+            :i += 2;
+        endif
+    elseif (rest.strip_prefix('*')?) then (Some(after_open))
+        if (after_open.find('*')?) then (Some(close))
+            :flush plain; out += "#strong[recurse(inner)]";
+            :advance i past span; plain_start = i;
+        else (None)
+            :i += 1;
+        endif
+    elseif (rest.strip_prefix('_')?) then (Some(after_open))
+        if (after_open.find('_')?) then (Some(close))
+            :flush plain; out += "#emph[recurse(inner)]";
+            :advance i past span; plain_start = i;
+        else (None)
+            :i += 1;
+        endif
+    elseif (rest.strip_prefix('\`')?) then (Some(after_open))
+        if (after_open.find('\`')?) then (Some(close))
+            :flush plain;
+            :out += "#raw(\\"" + escape_raw(inner) + "\\")";
+            note right: Code spans do **not** recurse.\nescape_raw() only escapes \\ and ".
+            :advance i past span; plain_start = i;
+        else (None)
+            :i += 1;
+        endif
+    else (plain UTF-8 char)
+        :i += s[i..].chars().next().len_utf8();
+    endif
+endwhile (no)
+
+:out += escape_content(s[plain_start..]);
+:Return "[" + out + "]";
+
+stop
+@enduml

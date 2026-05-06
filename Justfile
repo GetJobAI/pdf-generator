@@ -15,7 +15,7 @@ watch file="tests/default.json":
 
 # Compile a test file
 compile file="tests/default.json": _mkdir
-    cargo run --quiet -- render -i {{file}} -o "pdf/$(basename '{{file}}' .typ).pdf"
+    @cargo run --quiet -- render -i {{file}} -o "pdf/$(basename '{{file}}' .json).pdf"
 
 # Compile all test files
 all:

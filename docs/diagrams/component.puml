@@ -1,0 +1,49 @@
+@startuml component
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+component "HTTP Client" as HttpClient
+component "CLI\n(clap)" as CLI
+
+package "pdf-generator" {
+    together {
+        component "HTTP Server\n(axum + utoipa)" as Server
+        component "Config\n(envy)" as Config
+    }
+    component "Compiler" as Compiler
+    together {
+        component "typst_writer" as Writer
+        component "ResumeData\n(serde)" as Model
+    }
+    component "str_to_content" as StrToContent
+}
+
+package "typst ecosystem" {
+    component "typst-as-lib\n(engine)" as TypstLib
+    component "typst-pdf\n(exporter)" as TypstPdf
+    together {
+        component "typst-assets\n(crate fonts)" as TypstAssets
+        component "JetBrainsMono\n(fonts/*.ttf)" as LocalFonts
+    }
+    file "template.typ\n(include_str!)" as Template
+}
+
+HttpClient --> Server : POST /generate
+Server --> HttpClient : PDF bytes
+
+CLI ..> Compiler : compile(data)
+CLI ..> Config : reads env
+
+Server ..> Compiler : compile(data)
+Server ..> Config : reads env
+
+Compiler ..> Writer : render(data)
+Compiler ..> TypstLib : compile Typst source
+Compiler ..> TypstPdf : export PDF bytes
+Compiler ..> TypstAssets : crate font data
+Compiler ..> LocalFonts : bundled font data
+Compiler ..> Template : Typst source
+
+Writer ..> StrToContent : str_to_content(text)
+Writer .> Model : reads fields
+@enduml
