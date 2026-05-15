@@ -2,50 +2,32 @@
 skinparam shadowing false
 start
 
-:Receive **POST /generate** (JSON request body);
+:Receive JSON request with resume data;
 
-:Deserialize JSON -> **ResumeData** struct (axum + serde_json);
+:Parse and validate resume data;
 
-if (Schema validation OK?) then (fail)
-    :Return **422** Unprocessable Entity;
-    stop
+if (Validation passed?) then (no)
+    :Prepare validation error response;
+else (yes)
+    :Render resume data to Typst markup;
+
+    :Compile Typst markup to a document;
+
+    if (Compilation succeeded?) then (no)
+        :Collect compilation diagnostics;
+        :Prepare error response with diagnostics;
+    else (yes)
+        :Export document to PDF;
+
+        if (Export succeeded?) then (no)
+            :Prepare internal error response;
+        else (yes)
+            :Prepare PDF response;
+        endif
+    endif
 endif
 
-:Spawn blocking task (Tokio thread pool);
-
-partition "Compiler::compile(data)" {
-    :typst_writer::render(data) -> Typst source string;
-
-    /' note right
-      Serializes all resume sections
-      into "#resume((...))".
-      Text fields pass through
-      str_to_content().
-    end note '/
-
-    :Build TypstEngine (fonts + source file resolver);
-
-    :engine.compile("main.typ") -> Warned<Result<PagedDocument>>;
-
-    if (Compile succeeded?) then (warnings)
-        :Log Typst warnings (tracing::warn!);
-    endif
-
-    if (Compile succeeded?) then (no)
-        :Extract diagnostics list;
-        :Return **400** Bad Request + diagnostics JSON;
-        stop
-    endif
-
-    :typst_pdf::pdf(document) -> Vec<u8> (PDF bytes);
-
-    if (PDF export OK?) then (no)
-        :Return **500** Internal Server Error;
-        stop
-    endif
-}
-
-:Return **200 OK** Content-Type: application/pdf (binary PDF body);
+:Send response to client;
 
 stop
 @enduml

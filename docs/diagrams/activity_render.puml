@@ -1,0 +1,28 @@
+@startuml activity_render
+skinparam shadowing false
+start
+
+:Receive structured resume data;
+
+:Map each resume section to Typst named parameters;
+
+while (More text fields to render?) is (yes)
+    if (Field supports inline markup?) then (yes)
+        while (More text remaining in field?) is (yes)
+            if (Markup span found with matching close?) then (yes)
+                :Emit Typst equivalent\n(#strong[], #emph[], #raw());
+            else (no)
+                :Escape and emit plain text;
+            endif
+        endwhile (done)
+    else (no)
+        :Escape and emit field value;
+    endif
+endwhile (done)
+
+:Combine rendered parameters with Typst template;
+
+:Output Typst source string;
+
+stop
+@enduml
