@@ -4,6 +4,7 @@ use axum::{
     extract::State,
     http::{StatusCode, header},
     response::{IntoResponse, Response},
+    routing::get,
 };
 use serde::Serialize;
 use utoipa::{OpenApi, ToSchema};
@@ -132,5 +133,9 @@ pub fn router(compiler: Compiler) -> Router {
         .with_state(state)
         .split_for_parts();
 
-    router.merge(Scalar::with_url("/docs", api))
+    let spec = api.clone();
+
+    router
+        .route("/openapi.json", get(async || Json(spec)))
+        .merge(Scalar::with_url("/docs", api))
 }
