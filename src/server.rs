@@ -16,11 +16,14 @@ use crate::error::Error;
 use crate::resume::{ResumeData, resume_example};
 
 #[derive(OpenApi)]
-#[openapi(info(
-    title = "PDF Generator",
-    version = env!("CARGO_PKG_VERSION"),
-    description = "Compiles resume JSON to PDF using the GetJobAI Typst template."
-))]
+#[openapi(
+    info(
+        title = "PDF Generator",
+        version = env!("CARGO_PKG_VERSION"),
+        description = "Compiles resume JSON to PDF using the GetJobAI Typst template."
+    ),
+    servers((url = "/api/v1/pdf"))
+)]
 struct ApiDoc;
 
 /// Error response returned on compilation failure or internal error.
