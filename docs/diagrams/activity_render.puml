@@ -10,17 +10,19 @@ while (More text fields to render?) is (yes)
     if (Field supports inline markup?) then (yes)
         while (More text remaining in field?) is (yes)
             if (Markup span found with matching close?) then (yes)
-                :Emit Typst equivalent\n(#strong[], #emph[], #raw());
+                :Emit equivalent\nTypst\nfunction call;
             else (no)
-                :Escape and emit plain text;
+                :Escape special characters;
+                :Emit plain text;
             endif
-        endwhile (done)
+        endwhile (no)
     else (no)
-        :Escape and emit field value;
+        :Escape special characters;
+        :Emit plain text;
     endif
-endwhile (done)
+endwhile (no)
 
-:Combine rendered parameters with Typst template;
+:Combine rendered parameter string with Typst template;
 
 :Output Typst source string;
 

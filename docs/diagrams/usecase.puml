@@ -4,8 +4,7 @@ skinparam actorStyle stick
 skinparam packageStyle rectangle
 skinparam shadowing false
 actor "Developer" as Dev
-actor "Frontend" <<system>> as Frontend
-actor "Resume Parser Service" <<system>> as Parser
+actor "API User" as User
 
 rectangle "PDF Generator Service" {
     usecase "Generate PDF" as UC_Generate
@@ -14,13 +13,13 @@ rectangle "PDF Generator Service" {
     usecase "Render PDF\nlocally (CLI)" as UC_CLI
 }
 
-Dev -> UC_Docs
-Dev -> UC_CLI
+Dev --> UC_Docs
+Dev --> UC_CLI
 Dev --> UC_Generate
 Dev --> UC_Health
 
-Frontend --> UC_Generate
-Frontend --> UC_Health
+User --> UC_Generate
+User --> UC_Health
+User --> UC_Docs
 
-Parser --> UC_Generate
 @enduml
